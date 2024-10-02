@@ -88,6 +88,12 @@ public class WordleGame {
     
     //
     public void play() {
+        System.out.println(
+            "Welcome to Wordle! Try to guess the 5-letter word in " +
+            attemptsAllowed +
+            " attempts. Enter a valid 5-letter word to begin. Meow! <3"
+        );
+        
         try (Scanner scan = new Scanner(System.in)) {
             int[] goal = new int[5];
             Arrays.fill(goal, 1);
@@ -96,7 +102,7 @@ public class WordleGame {
             int numAttempts = 0;
             
             while (numAttempts < attemptsAllowed && !Arrays.equals(comparison, goal)) {
-                String guess = scan.nextLine();
+                String guess = scan.nextLine().toLowerCase();
                 
                 if (!wordTree.isValidWord(guess)) {
                     System.out.println("Please enter a valid 5-letter word.");
