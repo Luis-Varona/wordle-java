@@ -1,3 +1,3 @@
 #wordle-java
 
-An implementation of a Wordle game in Java with a variable number of attempts.
+A Wordle game written in Java with a variable maximum number of attempts.
