@@ -45,9 +45,9 @@ public class WordleGame {
     }
     
     //
-    private int[] compareGuess(String guess) {
-        int[] comparison = new int[5];
-        Arrays.fill(comparison, -1);
+    private char[] compareGuess(String guess) {
+        char[] comparison = new char[5];
+        Arrays.fill(comparison, 'R');
         UniqueLetters guessUniqueLetters = getUniqueLetters(guess);
         int wordIndex = 0;
         
@@ -67,7 +67,7 @@ public class WordleGame {
                 for (int i : indicesCorrect) {
                     letterCountWord--;
                     guessUniqueLetters.removeIndex(guessIndex, i);
-                    comparison[i] = 1;
+                    comparison[i] = 'G';
                 }
                 
                 for (int i : letterIndicesGuess) {
@@ -76,7 +76,7 @@ public class WordleGame {
                     }
                     
                     letterCountWord--;
-                    comparison[i] = 0;
+                    comparison[i] = 'Y';
                 }
             }
             
@@ -95,10 +95,10 @@ public class WordleGame {
         );
         
         try (Scanner scan = new Scanner(System.in)) {
-            int[] goal = new int[5];
-            Arrays.fill(goal, 1);
-            int[] comparison = new int[5];
-            Arrays.fill(comparison, -1);
+            char[] goal = new char[5];
+            Arrays.fill(goal, 'G');
+            char[] comparison = new char[5];
+            Arrays.fill(comparison, 'R');
             int numAttempts = 0;
             
             while (numAttempts < attemptsAllowed && !Arrays.equals(comparison, goal)) {
