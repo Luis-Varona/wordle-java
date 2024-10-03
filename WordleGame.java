@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.TreeSet;
 
 public class WordleGame {
-    //
     private final String word;
     private final int attemptsAllowed;
     private final WordTree wordTree;
@@ -18,20 +18,63 @@ public class WordleGame {
     }
     
     //
+    public void play() {
+        System.out.println(
+            "Welcome to Wordle! Try to guess the 5-letter word in " +
+            attemptsAllowed +
+            " attempts. Enter a valid 5-letter word to begin. Meow! <3"
+        );
+        
+        try (Scanner scan = new Scanner(System.in)) {
+            int numAttempts = 0;
+            String guess = "00000";
+            
+            while (numAttempts < attemptsAllowed && !guess.equals(word)) {
+                guess = scan.nextLine().toLowerCase();
+                
+                if (!wordTree.isValidWord(guess)) {
+                    System.out.println(
+                        "Invalid input. Please enter a valid 5-letter word."
+                    );
+                }
+                else {
+                    char[] comparison = compareGuess(guess);
+                    System.out.println(Arrays.toString(comparison));
+                    numAttempts++;
+                }
+            }
+            
+            if (guess.equals(word)) {
+                System.out.println(
+                        "\nCongratulations! You guessed the word `" +
+                        word +
+                        "` in " +
+                        numAttempts +
+                        " tries. Meow! <3"
+                );
+            }
+            else {
+                System.out.println(
+                    "\nSorry--you've run out of attempts. The word was `" +
+                    word +
+                    ".` Better luck next time! Meow! <3"
+                );
+            }
+        }
+    }
+    
+    //
     private UniqueLetters getUniqueLetters(String word) {
         ArrayList<Character> letters = new ArrayList<>();
         ArrayList<Integer> counts = new ArrayList<>();
         ArrayList<TreeSet<Integer>> indices = new ArrayList<>();
-        int numUnique = 0;
         int indexLetter = 0;
         
         for (char c : word.toCharArray()) {
             if (!letters.contains(c)) {
                 letters.add(c);
                 counts.add(1);
-                indices.add(new TreeSet<>());
-                indices.get(numUnique).add(indexLetter);
-                numUnique++;
+                indices.add(new TreeSet<>(Arrays.asList(indexLetter)));
             } else {
                 int index = letters.indexOf(c);
                 counts.set(index, counts.get(index) + 1);
@@ -46,84 +89,66 @@ public class WordleGame {
     
     //
     private char[] compareGuess(String guess) {
-        char[] comparison = new char[5];
-        Arrays.fill(comparison, 'R');
-        UniqueLetters guessUniqueLetters = getUniqueLetters(guess);
-        int wordIndex = 0;
+        char[] comparison = new char[] {'R', 'R', 'R', 'R', 'R'};
+        UniqueLetters guessLetters = getUniqueLetters(guess);
+        int indexWord = 0;
         
         for (char c : uniqueLetters.getLetters()) {
-            int guessIndex = guessUniqueLetters.getLetters().indexOf(c);
+            int indexGuess = guessLetters.getLetters().indexOf(c);
             
-            if (guessIndex != -1) {
-                int letterCountWord = uniqueLetters.getCounts().get(wordIndex);
+            if (indexGuess != -1) {
+                int repsRemaining = uniqueLetters.getCounts().get(indexWord);
+                TreeSet<Integer> indicesGreen = guessLetters.getIndices().get(indexGuess);
+                Iterator<Integer> indicesYellow = new TreeSet<>(indicesGreen).iterator();
+                indicesGreen.retainAll(uniqueLetters.getIndices().get(indexWord));
                 
-                TreeSet<Integer> letterIndicesGuess = guessUniqueLetters
-                    .getIndices()
-                    .get(guessIndex);
-                
-                TreeSet<Integer> indicesCorrect = new TreeSet<>(letterIndicesGuess);
-                indicesCorrect.retainAll(uniqueLetters.getIndices().get(wordIndex));
-                
-                for (int i : indicesCorrect) {
-                    letterCountWord--;
-                    guessUniqueLetters.removeIndex(guessIndex, i);
+                for (int i : indicesGreen) {
                     comparison[i] = 'G';
+                    repsRemaining--;
                 }
                 
-                for (int i : letterIndicesGuess) {
-                    if (letterCountWord <= 0) {
-                        break;
-                    }
+                while (indicesYellow.hasNext() && repsRemaining > 0) {
+                    int index = indicesYellow.next();
                     
-                    letterCountWord--;
-                    comparison[i] = 'Y';
+                    if (!indicesGreen.contains(index)) {
+                        comparison[index] = 'Y';
+                        repsRemaining--;
+                    }
                 }
             }
             
-            wordIndex++;
+            indexWord++;
         }
         
         return comparison;
     }
     
     //
-    public void play() {
-        System.out.println(
-            "Welcome to Wordle! Try to guess the 5-letter word in " +
-            attemptsAllowed +
-            " attempts. Enter a valid 5-letter word to begin. Meow! <3"
-        );
+    private class UniqueLetters {
+        private final ArrayList<Character> letters;
+        private final ArrayList<Integer> counts;
+        private final ArrayList<TreeSet<Integer>> indices;
         
-        try (Scanner scan = new Scanner(System.in)) {
-            char[] goal = new char[5];
-            Arrays.fill(goal, 'G');
-            char[] comparison = new char[5];
-            Arrays.fill(comparison, 'R');
-            int numAttempts = 0;
-            
-            while (numAttempts < attemptsAllowed && !Arrays.equals(comparison, goal)) {
-                String guess = scan.nextLine().toLowerCase();
-                
-                if (!wordTree.isValidWord(guess)) {
-                    System.out.println("Please enter a valid 5-letter word.");
-                    continue;
-                }
-                
-                comparison = compareGuess(guess);
-                System.out.println(Arrays.toString(comparison));
-                numAttempts++;
-            }
-            
-            if (Arrays.equals(comparison, goal)) {
-                System.out.println(
-                        "\nCongratulations! You guessed the word in " +
-                        numAttempts +
-                        " tries."
-                );
-            }
-            else {
-                System.out.println("\nSorry--you've run out of attempts. Better luck next time!");
-            }
+        public UniqueLetters(
+            ArrayList<Character> letters,
+            ArrayList<Integer> counts,
+            ArrayList<TreeSet<Integer>> indices
+        ) {
+            this.letters = letters;
+            this.counts = counts;
+            this.indices = indices;
+        }
+        
+        public ArrayList<Character> getLetters() {
+            return letters;
+        }
+        
+        public ArrayList<Integer> getCounts() {
+            return counts;
+        }
+        
+        public ArrayList<TreeSet<Integer>> getIndices() {
+            return indices;
         }
     }
 }
