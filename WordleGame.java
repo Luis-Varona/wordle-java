@@ -38,8 +38,9 @@ public class WordleGame {
                     );
                 }
                 else {
-                    char[] comparison = compareGuess(guess);
-                    System.out.println(Arrays.toString(comparison));
+                    // int[] comparison = compareGuess(guess);
+                    // System.out.println(Arrays.toString(comparison));
+                    System.out.println(new ColorComparison(guess, compareGuess(guess)));
                     numAttempts++;
                 }
             }
@@ -88,8 +89,9 @@ public class WordleGame {
     }
     
     //
-    private char[] compareGuess(String guess) {
-        char[] comparison = new char[] {'R', 'R', 'R', 'R', 'R'};
+    private int[] compareGuess(String guess) {
+        int[] comparison = new int[5];
+        Arrays.fill(comparison, -1);
         UniqueLetters guessLetters = getUniqueLetters(guess);
         int indexWord = 0;
         
@@ -103,7 +105,7 @@ public class WordleGame {
                 indicesGreen.retainAll(uniqueLetters.getIndices().get(indexWord));
                 
                 for (int i : indicesGreen) {
-                    comparison[i] = 'G';
+                    comparison[i] = 1;
                     repsRemaining--;
                 }
                 
@@ -111,7 +113,7 @@ public class WordleGame {
                     int index = indicesYellow.next();
                     
                     if (!indicesGreen.contains(index)) {
-                        comparison[index] = 'Y';
+                        comparison[index] = 0;
                         repsRemaining--;
                     }
                 }
@@ -149,6 +151,40 @@ public class WordleGame {
         
         public ArrayList<TreeSet<Integer>> getIndices() {
             return indices;
+        }
+    }
+    
+    //
+    private class ColorComparison {
+        private final String word;
+        private final int[] comparison;
+        
+        public ColorComparison(String word, int[] comparison) {
+            this.word = word.toUpperCase();
+            this.comparison = comparison;
+        }
+        
+        private static final String ANSI_RESET = "\u001B[0m";
+        private static final String ANSI_BLACK = "\u001B[30m";
+        private static final String ANSI_GREEN = "\u001B[32m";
+        private static final String ANSI_YELLOW = "\u001B[33m";
+        
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            
+            for (int i = 0; i < word.length(); i++) {
+                switch (comparison[i]) {
+                    case 1 -> sb.append(ANSI_GREEN);
+                    case 0 -> sb.append(ANSI_YELLOW);
+                    default -> sb.append(ANSI_BLACK);
+                }
+                
+                sb.append(word.charAt(i)).append(' ');
+            }
+            
+            sb.append(ANSI_RESET);
+            return sb.toString();
         }
     }
 }
