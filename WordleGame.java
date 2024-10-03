@@ -125,7 +125,6 @@ public class WordleGame {
         return new UniqueLetters(letters, counts, indices);
     }
     
-    //
     private record UniqueLetters(
         ArrayList<Character> letters,
         ArrayList<Integer> counts,
