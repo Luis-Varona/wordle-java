@@ -67,19 +67,19 @@ public class WordleGame {
         
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder out = new StringBuilder();
             
             for (int i = 0; i < word.length(); i++) {
                 switch (comparison[i]) {
-                    case 1 -> sb.append(ANSI_GREEN);
-                    case 0 -> sb.append(ANSI_YELLOW);
-                    default -> sb.append(ANSI_BLACK);
+                    case 1 -> out.append(ANSI_GREEN);
+                    case 0 -> out.append(ANSI_YELLOW);
+                    default -> out.append(ANSI_BLACK);
                 }
                 
-                sb.append(word.charAt(i)).append(' ');
+                out.append(word.charAt(i)).append(' ');
             }
             
-            return sb.append(ANSI_RESET).toString();
+            return out.append(ANSI_RESET).toString();
         }
     }
     
