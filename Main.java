@@ -2,9 +2,9 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        String[] validWords = WordLists.getValidWords();
-        String word = validWords[new Random().nextInt(validWords.length)];
-        WordTree wordTree = new WordTree(validWords);
+        String[] wordleOptions = WordLists.getWordleOptions();
+        String word = wordleOptions[new Random().nextInt(wordleOptions.length)];
+        WordTree wordTree = new WordTree(WordLists.getValidWords());
         
         WordleGame game = new WordleGame(word, 6, wordTree);
         game.play();
