@@ -65,6 +65,43 @@ public class WordleGame {
     }
     
     //
+    private int[] compareGuess(String guess) {
+        int[] comparison = new int[5];
+        Arrays.fill(comparison, -1);
+        UniqueLetters guessLetters = getUniqueLetters(guess);
+        int indexWord = 0;
+        
+        for (char c : uniqueLetters.letters()) {
+            int indexGuess = guessLetters.letters().indexOf(c);
+            
+            if (indexGuess != -1) {
+                int repsRemaining = uniqueLetters.counts().get(indexWord);
+                TreeSet<Integer> indicesGreen = guessLetters.indices().get(indexGuess);
+                Iterator<Integer> indicesYellow = new TreeSet<>(indicesGreen).iterator();
+                indicesGreen.retainAll(uniqueLetters.indices().get(indexWord));
+                
+                for (int i : indicesGreen) {
+                    comparison[i] = 1;
+                    repsRemaining--;
+                }
+                
+                while (indicesYellow.hasNext() && repsRemaining > 0) {
+                    int index = indicesYellow.next();
+                    
+                    if (!indicesGreen.contains(index)) {
+                        comparison[index] = 0;
+                        repsRemaining--;
+                    }
+                }
+            }
+            
+            indexWord++;
+        }
+        
+        return comparison;
+    }
+    
+    //
     private UniqueLetters getUniqueLetters(String word) {
         ArrayList<Character> letters = new ArrayList<>();
         ArrayList<Integer> counts = new ArrayList<>();
@@ -89,70 +126,11 @@ public class WordleGame {
     }
     
     //
-    private int[] compareGuess(String guess) {
-        int[] comparison = new int[5];
-        Arrays.fill(comparison, -1);
-        UniqueLetters guessLetters = getUniqueLetters(guess);
-        int indexWord = 0;
-        
-        for (char c : uniqueLetters.getLetters()) {
-            int indexGuess = guessLetters.getLetters().indexOf(c);
-            
-            if (indexGuess != -1) {
-                int repsRemaining = uniqueLetters.getCounts().get(indexWord);
-                TreeSet<Integer> indicesGreen = guessLetters.getIndices().get(indexGuess);
-                Iterator<Integer> indicesYellow = new TreeSet<>(indicesGreen).iterator();
-                indicesGreen.retainAll(uniqueLetters.getIndices().get(indexWord));
-                
-                for (int i : indicesGreen) {
-                    comparison[i] = 1;
-                    repsRemaining--;
-                }
-                
-                while (indicesYellow.hasNext() && repsRemaining > 0) {
-                    int index = indicesYellow.next();
-                    
-                    if (!indicesGreen.contains(index)) {
-                        comparison[index] = 0;
-                        repsRemaining--;
-                    }
-                }
-            }
-            
-            indexWord++;
-        }
-        
-        return comparison;
-    }
-    
-    //
-    private class UniqueLetters {
-        private final ArrayList<Character> letters;
-        private final ArrayList<Integer> counts;
-        private final ArrayList<TreeSet<Integer>> indices;
-        
-        public UniqueLetters(
-            ArrayList<Character> letters,
-            ArrayList<Integer> counts,
-            ArrayList<TreeSet<Integer>> indices
-        ) {
-            this.letters = letters;
-            this.counts = counts;
-            this.indices = indices;
-        }
-        
-        public ArrayList<Character> getLetters() {
-            return letters;
-        }
-        
-        public ArrayList<Integer> getCounts() {
-            return counts;
-        }
-        
-        public ArrayList<TreeSet<Integer>> getIndices() {
-            return indices;
-        }
-    }
+    private record UniqueLetters(
+        ArrayList<Character> letters,
+        ArrayList<Integer> counts,
+        ArrayList<TreeSet<Integer>> indices
+    ) { }
     
     //
     private class ColorComparison {
