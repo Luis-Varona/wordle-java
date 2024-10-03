@@ -5,8 +5,7 @@ public class Main {
         String[] wordleOptions = WordLists.getWordleOptions();
         String word = wordleOptions[new Random().nextInt(wordleOptions.length)];
         WordTree wordTree = new WordTree(WordLists.getValidWords());
-        
-        WordleGame game = new WordleGame(word, 6, wordTree);
+        WordleGame game = new WordleGame(word, wordTree);
         game.play();
     }
 }

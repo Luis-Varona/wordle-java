@@ -6,13 +6,11 @@ import java.util.TreeSet;
 
 public class WordleGame {
     private final String word;
-    private final int attemptsAllowed;
     private final WordTree wordTree;
     private final UniqueLetters uniqueLetters;
     
-    public WordleGame(String word, int attemptsAllowed, WordTree wordTree) {
+    public WordleGame(String word, WordTree wordTree) {
         this.word = word;
-        this.attemptsAllowed = attemptsAllowed;
         this.wordTree = wordTree;
         this.uniqueLetters = getUniqueLetters(word);
     }
@@ -20,16 +18,15 @@ public class WordleGame {
     //
     public void play() {
         System.out.println(
-            "Welcome to Wordle! Try to guess the 5-letter word in " +
-            attemptsAllowed +
-            " attempts. Enter a valid 5-letter word to begin. Meow! <3"
+            "Welcome to Wordle! Try to guess the 5-letter word in 6 attempts. " +
+            "Enter a valid 5-letter word to begin. Meow! <3"
         );
         
         try (Scanner scan = new Scanner(System.in)) {
             int numAttempts = 0;
             String guess = "00000";
             
-            while (numAttempts < attemptsAllowed && !guess.equals(word)) {
+            while (numAttempts < 6 && !guess.equals(word)) {
                 guess = scan.nextLine().toLowerCase();
                 
                 if (!wordTree.isValidWord(guess)) {
@@ -38,9 +35,7 @@ public class WordleGame {
                     );
                 }
                 else {
-                    // int[] comparison = compareGuess(guess);
-                    // System.out.println(Arrays.toString(comparison));
-                    System.out.println(new ColorComparison(guess, compareGuess(guess)));
+                    System.out.println(new ColoredComparison(guess, compareGuess(guess)));
                     numAttempts++;
                 }
             }
@@ -61,6 +56,30 @@ public class WordleGame {
                     ".` Better luck next time! Meow! <3"
                 );
             }
+        }
+    }
+    
+    private record ColoredComparison(String word, int[] comparison) {
+        private static final String ANSI_RESET = "\u001B[0m";
+        private static final String ANSI_BLACK = "\u001B[30m";
+        private static final String ANSI_GREEN = "\u001B[32m";
+        private static final String ANSI_YELLOW = "\u001B[33m";
+        
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            
+            for (int i = 0; i < word.length(); i++) {
+                switch (comparison[i]) {
+                    case 1 -> sb.append(ANSI_GREEN);
+                    case 0 -> sb.append(ANSI_YELLOW);
+                    default -> sb.append(ANSI_BLACK);
+                }
+                
+                sb.append(word.charAt(i)).append(' ');
+            }
+            
+            return sb.append(ANSI_RESET).toString();
         }
     }
     
@@ -130,38 +149,4 @@ public class WordleGame {
         ArrayList<Integer> counts,
         ArrayList<TreeSet<Integer>> indices
     ) { }
-    
-    //
-    private class ColorComparison {
-        private final String word;
-        private final int[] comparison;
-        
-        public ColorComparison(String word, int[] comparison) {
-            this.word = word.toUpperCase();
-            this.comparison = comparison;
-        }
-        
-        private static final String ANSI_RESET = "\u001B[0m";
-        private static final String ANSI_BLACK = "\u001B[30m";
-        private static final String ANSI_GREEN = "\u001B[32m";
-        private static final String ANSI_YELLOW = "\u001B[33m";
-        
-        @Override
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-            
-            for (int i = 0; i < word.length(); i++) {
-                switch (comparison[i]) {
-                    case 1 -> sb.append(ANSI_GREEN);
-                    case 0 -> sb.append(ANSI_YELLOW);
-                    default -> sb.append(ANSI_BLACK);
-                }
-                
-                sb.append(word.charAt(i)).append(' ');
-            }
-            
-            sb.append(ANSI_RESET);
-            return sb.toString();
-        }
-    }
 }
