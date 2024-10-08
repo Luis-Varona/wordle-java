@@ -6,12 +6,12 @@ import java.util.TreeSet;
 
 public class WordleGame {
     private final String word;
-    private final WordTree wordTree;
+    private final WordTrie WordTrie;
     private final UniqueLetters uniqueLetters;
     
-    public WordleGame(String word, WordTree wordTree) {
+    public WordleGame(String word, WordTrie WordTrie) {
         this.word = word;
-        this.wordTree = wordTree;
+        this.WordTrie = WordTrie;
         this.uniqueLetters = getUniqueLetters(word);
     }
     
@@ -29,7 +29,7 @@ public class WordleGame {
             while (numAttempts < 6 && !guess.equals(word)) {
                 guess = scan.nextLine().toLowerCase();
                 
-                if (!wordTree.isValidWord(guess)) {
+                if (!WordTrie.isValidWord(guess)) {
                     System.out.println(
                         "Invalid input. Please enter a valid 5-letter word."
                     );
